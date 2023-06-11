@@ -1,0 +1,35 @@
+{
+  "name": "api",
+  "version": "1.0.0",
+  "description": "Api para proyecto de Finanzas",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "test": "Jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Fabio-Ramirez/finanzaapi.git"
+  },
+  "keywords": [
+    "fr118KPY"
+  ],
+  "author": "Fabio Josue Adrian Ramirez",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Fabio-Ramirez/finanzaapi/issues"
+  },
+  "homepage": "https://github.com/Fabio-Ramirez/finanzaapi#readme",
+  "dependencies": {
+    "bcrypt": "^5.1.0",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.0",
+    "mongoose": "^7.0.5"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
+  }
+}

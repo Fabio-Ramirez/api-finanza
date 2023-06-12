@@ -1,3 +1,4 @@
+import moment from 'moment';
 import Ingreso from '../models/ingresoModel.js';
 
 export const getIngresos = async (req, res) => {
@@ -36,14 +37,18 @@ export const registerIngreso = async (req, res) => {
         const { name, descripcion, tipo, monto, fecha, cotizacionUsd, comentario } = req.body;
 
         // Verificar si ya existe un ingreso con el mismo
-        /*const existingIngreso = await Ingreso.findOne({ email });
+        /*const currentMonth = fecha.format('YYYY-MM');
+        const existingIngreso = await Ingreso.findOne({ email });
         if (existingIngreso) {
             return res.status(400).json({ message: 'Ya existe un ingreso con el mismo correo electrónico' });
         }*/
 
+
         // Crear un nuevo ingreso
         const estado = 'creado';
         const newIngreso = new Ingreso({ name, descripcion, tipo, monto, fecha, cotizacionUsd, estado, comentario });
+        const momentFecha = moment(newIngreso.fecha);
+        newIngreso.fecha = momentFecha.format('DD-MM-YYYY');
         await newIngreso.save();
 
 

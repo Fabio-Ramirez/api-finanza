@@ -1,9 +1,10 @@
 import mongoose from 'mongoose';
+import moment from 'moment';
 
 const ingresoSchema = new mongoose.Schema({
     name: { type: String, required: true },
     descripcion: { type: String, required: true },
-    fecha: { type: Date, required: false },
+    fecha: { type: Object, required: false },
     monto: { type: Number, required: true },
     cotizacionUsd: { type: Number, required: false },
     totalDolares: { type: Number, required: false },

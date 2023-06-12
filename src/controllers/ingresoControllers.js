@@ -36,19 +36,25 @@ export const registerIngreso = async (req, res) => {
     try {
         const { name, descripcion, tipo, monto, fecha, cotizacionUsd, comentario } = req.body;
 
-        // Verificar si ya existe un ingreso con el mismo
-        /*const currentMonth = fecha.format('YYYY-MM');
-        const existingIngreso = await Ingreso.findOne({ email });
-        if (existingIngreso) {
-            return res.status(400).json({ message: 'Ya existe un ingreso con el mismo correo electrónico' });
-        }*/
-
-
         // Crear un nuevo ingreso
         const estado = 'creado';
         const newIngreso = new Ingreso({ name, descripcion, tipo, monto, fecha, cotizacionUsd, estado, comentario });
         const momentFecha = moment(newIngreso.fecha);
         newIngreso.fecha = momentFecha.format('DD-MM-YYYY');
+
+        // se verifica que no exista el ingreso "sueldo" en el mismo mes
+        const existingIngreso = await Ingreso.findOne({
+            name: 'Sueldo',
+            fecha: {
+                $gte: momentFecha.startOf('month').toDate(),
+                $lte: momentFecha.endOf('month').toDate()
+            }
+        });
+
+        if (existingIngreso) {
+            return res.status(400).json({ message: 'Ya existe un ingreso de sueldo en el mismo mes' });
+        }
+
         await newIngreso.save();
 
 

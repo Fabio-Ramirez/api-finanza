@@ -1,5 +1,7 @@
 import moment from 'moment';
 import Ingreso from '../models/ingresoModel.js';
+import Anio from '../models/anioModel.js';
+import anioRoute from '../routes/anioRoutes.js';
 
 export const getIngresos = async (req, res) => {
     try {
@@ -42,21 +44,37 @@ export const registerIngreso = async (req, res) => {
         const momentFecha = moment(newIngreso.fecha);
         newIngreso.fecha = momentFecha.format('DD-MM-YYYY');
 
-        // se verifica que no exista el ingreso "sueldo" en el mismo mes
+        /* Obtener el nombre del mes
+        const nombreMes = momentFecha.format('MMMM');
+        console.log("mes: ", nombreMes);
+        // Verificar si existe un ingreso "sueldo" en el mismo mes
         const existingIngreso = await Ingreso.findOne({
             name: 'Sueldo',
-            fecha: {
-                $gte: momentFecha.startOf('month').toDate(),
-                $lte: momentFecha.endOf('month').toDate()
-            }
+            fecha: { $regex: nombreMes, $options: 'i' }
         });
 
         if (existingIngreso) {
             return res.status(400).json({ message: 'Ya existe un ingreso de sueldo en el mismo mes' });
-        }
+        }*/
 
         await newIngreso.save();
 
+        // Encontrar el documento del año correspondiente
+        const anioIngreso = momentFecha.year();
+
+        // Buscar el año correspondiente por su nombre
+        const anio = await Anio.findOne({ _id: anioIngreso });
+
+        if (!anio) {
+            // El año no existe, crear un nuevo documento de año
+            const nuevoAnio = new Anio({ _id: anioIngreso });
+            nuevoAnio.ingresos.push(newIngreso);
+            await nuevoAnio.save();
+        } else {
+            // El año existe, insertar el ingreso en su lista de ingresos
+            anio.ingresos.push(newIngreso);
+            await anio.save();
+        }
 
         // Enviar una respuesta al cliente
         res.status(201).json({ message: 'Se ha creado con exito el registro de ingreso: ', newIngreso });

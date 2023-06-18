@@ -1,7 +1,6 @@
 import moment from 'moment';
 import Ingreso from '../models/ingresoModel.js';
 import Anio from '../models/anioModel.js';
-import anioRoute from '../routes/anioRoutes.js';
 
 export const getIngresos = async (req, res) => {
     try {
@@ -122,11 +121,30 @@ export const deleteIngreso = async (req, res) => {
     try {
         const { id } = req.params;
 
+        // Buscar el ingreso por su ID
+        const ingresoEliminar = await Ingreso.findById(id);
+        const fechaSave = JSON.stringify(ingresoEliminar.fecha);
+        const momentFecha = moment(fechaSave, 'DD-MM-YYYY').year();
+
+        if (!ingresoEliminar) {
+            return res.status(404).json({ message: 'Ingreso no encontrado' });
+        }
         // Buscar y eliminar el ingreso por su ID
         const result = await Ingreso.deleteOne({ _id: id });
 
         if (result.deletedCount === 0) {
             return res.status(404).json({ message: 'Ingreso no encontrado' });
+        }
+        else {
+            const anioIngreso = momentFecha;
+
+            const anio = await Anio.findOne({ _id: anioIngreso });
+
+            anio.ingresos = anio.ingresos.filter((ingresoId) => {
+                return (ingresoId.toString() !== id);
+            });
+
+            await anio.save();
         }
 
         // Enviar una respuesta al cliente

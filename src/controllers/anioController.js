@@ -1,4 +1,3 @@
-import moment from 'moment';
 import Anio from '../models/anioModel.js';
 
 export const getAnios = async (req, res) => {

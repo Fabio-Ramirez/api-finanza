@@ -67,11 +67,15 @@ export const registerIngreso = async (req, res) => {
         if (!anio) {
             // El año no existe, crear un nuevo documento de año
             const nuevoAnio = new Anio({ _id: anioIngreso });
-            nuevoAnio.ingresos.push(newIngreso);
+            nuevoAnio.ingresos.push(newIngreso._id);
             await nuevoAnio.save();
         } else {
-            // El año existe, insertar el ingreso en su lista de ingresos
-            anio.ingresos.push(newIngreso);
+            // El año existe, insertar el ingreso en su lista de ingresos, 
+            // EN caso de que no exista la lista de ingresos, se crea.
+            if (!anio.ingresos) {
+                anio.ingresos = [];
+            }
+            anio.ingresos.push(newIngreso._id);
             await anio.save();
         }
 

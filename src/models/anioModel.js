@@ -1,10 +1,10 @@
 import mongoose from 'mongoose';
-
+import Ingreso from '../models/ingresoModel.js';
 
 const anioSchema = new mongoose.Schema({
     _id: { type: Number, required: true, unique: true },
     descripcion: { type: String, required: false },
-    totalSueldo: { type: Number, required: false },
+    total: { type: Number, required: false },
     totalAdicional: { type: Number, required: false },
     promedioMensual: { type: Number, required: false },
     promedioMensualAdicionales: { type: Number, required: false },

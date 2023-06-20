@@ -1,10 +1,10 @@
 import express from 'express';
-import { getAnioById, getAnios, registerAnio } from '../controllers/anioController.js';
+import { getAnioById, getAnios, calcularEstadisticas } from '../controllers/anioController.js';
 
 const router = express.Router();
 
 
-router.post('/', registerAnio);
+router.patch('/:id', calcularEstadisticas);
 router.get('/', getAnios);
 router.get('/:id', getAnioById);
 

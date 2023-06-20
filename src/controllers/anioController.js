@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import Anio from '../models/anioModel.js';
 
 export const getAnios = async (req, res) => {
@@ -31,16 +32,49 @@ export const getAnioById = async (req, res) => {
     }
 };
 
-export const registerAnio = async (req, res) => {
+export const calcularEstadisticas = async (req, res) => {
     try {
+        const { id } = req.params;
 
+        // Buscar el documento de Anio por su ID y populando el campo 'ingresos'
+        const anio = await Anio.findById(id).populate('ingresos').exec();
+
+        if (!anio) {
+            console.log('No se encontró un documento de Anio con el ID proporcionado');
+            return;
+        }
+
+        // Acceder a los ingresos asociados al documento de Anio
+        const ingresos = anio.ingresos;
+        if (!ingresos) {
+            console.log('No hay ingresos en este año');
+            return;
+        }
+
+        let total = 0;
+        let totalMontoAdicional = 0;
+
+        ingresos.forEach((ingreso) => {
+            if (ingreso.name.toLowerCase() !== 'sueldo') {
+                totalMontoAdicional += ingreso.monto;
+            }
+            total += ingreso.monto;
+        });
+
+        console.log('Total de montos:', total, totalMontoAdicional, totalMontoAdicional + total);
+
+        // Realizar operaciones con los ingresos encontrados
+        console.log('Ingresos encontrados:', ingresos);
         // Enviar una respuesta al cliente
-        res.status(201).json({ message: 'Se ha creado con exito el registro de anio: ', });
+        res.status(201).json({ message: 'Se ha calculado las estadisticas', });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Ha ocurrido un error al registrar el anio' });
     }
 }
+
+
+
 
 
 

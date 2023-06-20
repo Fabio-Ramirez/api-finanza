@@ -111,6 +111,7 @@ export const registerIngreso = async (req, res) => {
     }
 };
 
+//Actualizar un ingreso
 export const updateIngreso = async (req, res) => {
     try {
         const { id } = req.params;
@@ -145,6 +146,7 @@ export const updateIngreso = async (req, res) => {
     }
 };
 
+//Eliminar un ingreso, y ademas en la bd de Anio.
 export const deleteIngreso = async (req, res) => {
     try {
         const { id } = req.params;
@@ -152,7 +154,8 @@ export const deleteIngreso = async (req, res) => {
         // Buscar el ingreso por su ID
         const ingresoEliminar = await Ingreso.findById(id);
         const fechaSave = JSON.stringify(ingresoEliminar.fecha);
-        const momentFecha = moment(fechaSave, 'DD-MM-YYYY').year();
+        const momentAnio = moment(fechaSave, 'DD-MM-YYYY').year();
+        const momentMes = moment(fechaSave, 'DD-MM-YYYY').month();
 
         if (!ingresoEliminar) {
             return res.status(404).json({ message: 'Ingreso no encontrado' });
@@ -164,13 +167,14 @@ export const deleteIngreso = async (req, res) => {
             return res.status(404).json({ message: 'Ingreso no encontrado' });
         }
         else {
-            const anioIngreso = momentFecha;
-
+            const anioIngreso = momentAnio;
             const anio = await Anio.findOne({ _id: anioIngreso });
+            let mesIngresoEliminar = anio.meses.find(mes => mes._id === momentMes);
 
-            anio.ingresos = anio.ingresos.filter((ingresoId) => {
-                return (ingresoId.toString() !== id);
-            });
+
+            mesIngresoEliminar.ingresos = mesIngresoEliminar.ingresos.filter((ingresoId) => {
+                return (ingresoId.toString() !== id.toString());
+            })
 
             await anio.save();
         }

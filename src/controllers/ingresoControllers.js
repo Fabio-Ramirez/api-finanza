@@ -2,6 +2,7 @@ import moment from 'moment';
 import Ingreso from '../models/ingresoModel.js';
 import Anio from '../models/anioModel.js';
 
+//Obtener todos los ingresos
 export const getIngresos = async (req, res) => {
     try {
         // Obtener todos los ingresos de la base de datos
@@ -15,6 +16,7 @@ export const getIngresos = async (req, res) => {
     }
 };
 
+//Obtener el ingreso solicitado
 export const getIngresoById = async (req, res) => {
     try {
         const { id } = req.params;
@@ -33,13 +35,14 @@ export const getIngresoById = async (req, res) => {
     }
 };
 
+//Registrar un ingreso
 export const registerIngreso = async (req, res) => {
     try {
-        const { name, descripcion, tipo, monto, fecha, cotizacionUsd, comentario } = req.body;
+        const { name, descripcion, categoria, monto, fecha, cotizacionUsd, comentario } = req.body;
 
         // Crear un nuevo ingreso
         const estado = 'creado';
-        const newIngreso = new Ingreso({ name, descripcion, tipo, monto, fecha, cotizacionUsd, estado, comentario });
+        const newIngreso = new Ingreso({ name, descripcion, categoria, monto, fecha, cotizacionUsd, estado, comentario });
         const momentFecha = moment(newIngreso.fecha);
         newIngreso.fecha = momentFecha.format('DD-MM-YYYY');
 
@@ -58,29 +61,50 @@ export const registerIngreso = async (req, res) => {
 
         await newIngreso.save();
 
+        //Iniciar el guardado en el año.
         // Encontrar el documento del año correspondiente
         const anioIngreso = momentFecha.year();
 
         // Buscar el año correspondiente por su nombre
         const anio = await Anio.findOne({ _id: anioIngreso });
 
+        // El año no existe, crear un nuevo documento de año
         if (!anio) {
-            // El año no existe, crear un nuevo documento de año
             const nuevoAnio = new Anio({ _id: anioIngreso });
-            nuevoAnio.ingresos.push(newIngreso._id);
+
+            // Crear el mes
+            const ingresoMes = {
+                _id: momentFecha.month(),
+                nombre: momentFecha.locale('es').format('MMMM'),
+                ingresos: newIngreso._id
+            }
+            nuevoAnio.meses.push(ingresoMes);
+
             await nuevoAnio.save();
         } else {
-            // El año existe, insertar el ingreso en su lista de ingresos, 
-            // EN caso de que no exista la lista de ingresos, se crea.
-            if (!anio.ingresos) {
-                anio.ingresos = [];
+            // El año existe, insertar el ingreso en su lista de meses, 
+            const mesIngreso = anio.meses.find(mes => mes._id === momentFecha.month());
+            // EN caso de que no exista el mes, se crea.
+            if (!mesIngreso) {
+
+                const ingresoMes = {
+                    _id: momentFecha.month(),
+                    nombre: momentFecha.locale('es').format('MMMM'),
+                    ingresos: []
+                }
+                ingresoMes.ingresos.push(newIngreso._id);
+                anio.meses.push(ingresoMes);
+                await anio.save();
             }
-            anio.ingresos.push(newIngreso._id);
-            await anio.save();
+            // EN caso de que exista el mes, se inserta el ingreso en la lista.
+            else {
+                mesIngreso.ingresos.push(newIngreso._id);
+                await anio.save();
+            }
         }
 
         // Enviar una respuesta al cliente
-        res.status(201).json({ message: 'Se ha creado con exito el registro de ingreso: ', newIngreso });
+        res.status(201).json({ message: 'Se ha creado con exito el registro de ingreso: ' + newIngreso._id });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Ha ocurrido un error al registrar el ingreso' });
@@ -90,7 +114,7 @@ export const registerIngreso = async (req, res) => {
 export const updateIngreso = async (req, res) => {
     try {
         const { id } = req.params;
-        const { name, descripcion, tipo, monto, fecha, cotizacionUsd, comentario } = req.body;
+        const { name, descripcion, categoria, monto, fecha, cotizacionUsd, comentario } = req.body;
 
         // Buscar y actualizar el ingreso por su ID
         const estado = 'modificado';
@@ -99,7 +123,7 @@ export const updateIngreso = async (req, res) => {
             {
                 name,
                 descripcion,
-                tipo,
+                categoria,
                 monto,
                 fecha,
                 cotizacionUsd,

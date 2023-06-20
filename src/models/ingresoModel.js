@@ -11,7 +11,7 @@ const ingresoSchema = new mongoose.Schema({
     valorSueldoUsd: { type: Number, required: false },
     inflacion: { type: Number, required: false },
     comentario: { type: String, required: false },
-    tipo: { type: String, required: false },  /* sueldo, adicional*/
+    categoria: { type: String, required: false },  /* sueldo, adicional*/
     estado: {
         type: String,
         required: true,

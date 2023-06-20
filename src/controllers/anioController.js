@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import Anio from '../models/anioModel.js';
 
+//Obtener todos los años
 export const getAnios = async (req, res) => {
     try {
         // Obtener todos los anios de la base de datos
@@ -14,6 +15,7 @@ export const getAnios = async (req, res) => {
     }
 };
 
+//Obtener el año
 export const getAnioById = async (req, res) => {
     try {
         const { id } = req.params;
@@ -32,6 +34,7 @@ export const getAnioById = async (req, res) => {
     }
 };
 
+//Calcular la estadisticas
 export const calcularEstadisticas = async (req, res) => {
     try {
         const { id } = req.params;
@@ -51,6 +54,7 @@ export const calcularEstadisticas = async (req, res) => {
             return;
         }
 
+        //Se realizan las estadisticas
         let total = 0;
         let totalMontoAdicional = 0;
 
@@ -61,12 +65,13 @@ export const calcularEstadisticas = async (req, res) => {
             total += ingreso.monto;
         });
 
-        console.log('Total de montos:', total, totalMontoAdicional, totalMontoAdicional + total);
-
-        // Realizar operaciones con los ingresos encontrados
-        console.log('Ingresos encontrados:', ingresos);
+        //console.log('Total de montos:', total, totalMontoAdicional, totalMontoAdicional + total);
+        const estadisticas = {
+            total: total,
+            totalMontoAdicional: totalMontoAdicional
+        }
         // Enviar una respuesta al cliente
-        res.status(201).json({ message: 'Se ha calculado las estadisticas', });
+        res.status(201).json({ message: 'Se ha calculado las estadisticas', estadisticas });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Ha ocurrido un error al registrar el anio' });

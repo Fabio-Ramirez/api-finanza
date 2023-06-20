@@ -11,7 +11,14 @@ const anioSchema = new mongoose.Schema({
     valorSueldoUsd: { type: Number, required: false },
     variacionAcumulada: { type: Number, required: false },
     comentario: { type: String, required: false },
-    ingresos: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Ingreso' }]
+    meses: [
+        {
+            _id: { type: Number, required: true, unique: true },
+            nombre: { type: String, required: false },
+            ingresos: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Ingreso' }]
+        }
+    ]
+
 });
 
 const Anio = mongoose.model('Anio', anioSchema);

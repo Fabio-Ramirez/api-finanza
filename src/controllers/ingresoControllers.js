@@ -157,7 +157,7 @@ export const deleteIngreso = async (req, res) => {
         const ingresoEliminar = await Ingreso.findById(id);
         const fechaSave = JSON.stringify(ingresoEliminar.fecha);
         const momentAnio = moment(fechaSave, 'DD-MM-YYYY').year();
-        const momentMes = moment(fechaSave, 'DD-MM-YYYY').month();
+        const momentMes = (moment(fechaSave, 'DD-MM-YYYY').month() + 1);
 
         if (!ingresoEliminar) {
             return res.status(404).json({ message: 'Ingreso no encontrado' });
@@ -171,8 +171,7 @@ export const deleteIngreso = async (req, res) => {
         else {
             const anioIngreso = momentAnio;
             const anio = await Anio.findOne({ _id: anioIngreso });
-            let mesIngresoEliminar = anio.meses.find(mes => mes._id === momentMes);
-
+            let mesIngresoEliminar = anio.meses.find(mes => mes.nroMes === momentMes);
 
             mesIngresoEliminar.ingresos = mesIngresoEliminar.ingresos.filter((ingresoId) => {
                 return (ingresoId.toString() !== id.toString());

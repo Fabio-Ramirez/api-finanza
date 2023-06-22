@@ -13,8 +13,8 @@ const anioSchema = new mongoose.Schema({
     comentario: { type: String, required: false },
     meses: [
         {
-            _id: { type: Number, required: true, unique: true },
             nombre: { type: String, required: false },
+            nroMes: { type: Number, required: false, unique: false },
             ingresos: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Ingreso' }]
         }
     ]

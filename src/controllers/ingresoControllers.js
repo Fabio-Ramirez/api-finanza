@@ -74,8 +74,8 @@ export const registerIngreso = async (req, res) => {
 
             // Crear el mes
             const ingresoMes = {
-                _id: momentFecha.month(),
                 nombre: momentFecha.locale('es').format('MMMM'),
+                nroMes: (momentFecha.month() + 1),
                 ingresos: newIngreso._id
             }
             nuevoAnio.meses.push(ingresoMes);
@@ -83,13 +83,15 @@ export const registerIngreso = async (req, res) => {
             await nuevoAnio.save();
         } else {
             // El año existe, insertar el ingreso en su lista de meses, 
-            const mesIngreso = anio.meses.find(mes => mes._id === momentFecha.month());
+            const mesIngreso = anio.meses.find(mes => {
+                return mes.nroMes === (momentFecha.month() + 1);
+            });
             // EN caso de que no exista el mes, se crea.
             if (!mesIngreso) {
 
                 const ingresoMes = {
-                    _id: momentFecha.month(),
                     nombre: momentFecha.locale('es').format('MMMM'),
+                    nroMes: (momentFecha.month() + 1),
                     ingresos: []
                 }
                 ingresoMes.ingresos.push(newIngreso._id);
